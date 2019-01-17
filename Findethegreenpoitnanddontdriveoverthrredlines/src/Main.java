@@ -21,9 +21,10 @@ public class Main {
 
 	public static void main(String[] Args) throws IOException {
 
-		CompassHTSensor CompassS = new CompassHTSensor(SensorPort.S3);
-		LightSensor LightSR = new LightSensor(SensorPort.S2);
+		
+		LightSensor LightSR = new LightSensor(SensorPort.S3);
 		LightSensor LightSL = new LightSensor(SensorPort.S1);
+		ColorHTSensor ColorS = new ColorHTSensor(SensorPort.S2);
 
 		bluetoothConnection = Bluetooth.waitForConnection();
 		bluetoothConnection.setIOMode(NXTConnection.RAW);
@@ -34,6 +35,75 @@ public class Main {
 		boolean end = false;
 		boolean rechts = false;
 		boolean links = false;
+		boolean found = false;
+		
+		LightSL.setFloodlight(true);
+		LightSR.setFloodlight(true);
+//		while(true) {
+//			
+//			LCD.drawInt(ColorS.getColor().getRed(), 0, 0);
+//			LCD.drawInt(ColorS.getColor().getGreen(), 0, 1);
+//			LCD.drawInt(ColorS.getColorID(), 0, 2);
+//			
+//			if(rechts == true) {
+//				break;
+//			}
+//			
+//		}
+		
+		
+		
+		
+		
+		
+//		while(true) {
+//			
+//			Motor.B.forward();
+//			Motor.C.forward();
+//			
+//			if(ColorS.getColor().getGreen()>10) {
+//				Motor.B.stop();
+//				Motor.C.stop();
+//		
+//				break;
+//				
+//			}
+//			
+//			if((ColorS.getColor().getRed()>5)&&(ColorS.getColor().getGreen()<5)) {
+//				
+//			
+//				
+//				
+//				Motor.B.stop(true);
+//				Motor.C.stop(true);
+//				
+//				
+//				Motor.B.backward();
+//				Motor.C.backward();
+//				try {
+//					Thread.sleep(900);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				Motor.B.stop(true);
+//				Motor.C.stop(true);
+//				
+//				
+//				
+//			}
+//			
+//			
+//			if(rechts == true) {
+//				break;
+//			}
+//			
+//		}
+		
+		
+		
+		
+		
 
 		LCD.drawString("Wartet auf nachricht", 1, 1);
 
@@ -49,12 +119,17 @@ public class Main {
 			switch (androidmessage) {
 
 			case 100: {
+				links= false;
+				rechts= false;
 
-				Motor.B.setSpeed(360);
-				Motor.C.setSpeed(360);
+				Motor.B.setSpeed(250);
+				Motor.C.setSpeed(250);
 
+				if(!found) {
 				Motor.B.forward();
 				Motor.C.forward();
+				
+				}
 
 				while (true) {
 					
@@ -63,17 +138,20 @@ public class Main {
 					
 					
 					// wenn der linke sensor eine rote linie findet
-					if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+					if (LightSL.getLightValue() == 47 || LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
 						links = true;
 						rechts= false;
-						boolean found = false;
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
+						
+						Motor.B.setSpeed(250);
+						Motor.C.setSpeed(250);
+						
+						
+						
 						while (true) {
-							if (LightSL.getLightValue() < 48) {
+							if (LightSL.getLightValue() < 47) {
 								break;
 							}
-							if (LightSL.getLightValue() > 53) {
+							if (LightSL.getLightValue() > 51) {
 								found = true;
 								Motor.B.stop(true);
 								Motor.C.stop(true);
@@ -86,6 +164,10 @@ public class Main {
 						}
 						Motor.B.stop(true);
 						Motor.C.stop(true);
+						
+						Motor.B.setSpeed(360);
+						Motor.C.setSpeed(360);
+						
 						Motor.B.backward();
 						Motor.C.backward();
 						try {
@@ -100,56 +182,18 @@ public class Main {
 						break;
 					}
 					
-					
-					if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
-						links = true;
-						rechts= false;
-						boolean found = false;
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
-						while (true) {
-							if (LightSL.getLightValue() < 48) {
-								break;
-							}
-							if (LightSL.getLightValue() > 53) {
-								found = true;
-								Motor.B.stop(true);
-								Motor.C.stop(true);
-								write(1);
-								break;
-							}
-						}
-						if (found == true) {
-							break;
-						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						Motor.B.backward();
-						Motor.C.backward();
-						try {
-							Thread.sleep(900);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						write(50);
-						break;
-					}
-					
-					
-					if (LightSR.getLightValue() == 48 || LightSR.getLightValue() == 49) {
+					//wenn der rechte Sensor eine rote linie findet
+					if (LightSR.getLightValue() == 47 || LightSR.getLightValue() == 48 || LightSR.getLightValue() == 49) {
 						links = false;
 						rechts= true;
-						boolean found = false;
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
+						
+						Motor.B.setSpeed(250);
+						Motor.C.setSpeed(250);
 						while (true) {
-							if (LightSR.getLightValue() < 48) {
+							if (LightSL.getLightValue() < 47) {
 								break;
 							}
-							if (LightSR.getLightValue() > 53) {
+							if (LightSL.getLightValue() > 51) {
 								found = true;
 								Motor.B.stop(true);
 								Motor.C.stop(true);
@@ -162,6 +206,10 @@ public class Main {
 						}
 						Motor.B.stop(true);
 						Motor.C.stop(true);
+						
+
+						Motor.B.setSpeed(360);
+						Motor.C.setSpeed(360);
 						Motor.B.backward();
 						Motor.C.backward();
 						try {
@@ -177,14 +225,56 @@ public class Main {
 					}
 					
 					
-					
-					
-					
-					
-					
-					if (LightSL.getLightValue() >= 54||LightSR.getLightValue()>=54) {
+					if((ColorS.getColor().getGreen()<5)&&(ColorS.getColor().getRed()>5)) {
+						
+					links= true;
 						Motor.B.stop(true);
 						Motor.C.stop(true);
+
+						Motor.B.setSpeed(360);
+						Motor.C.setSpeed(360);
+						Motor.B.backward();
+						Motor.C.backward();
+						try {
+							Thread.sleep(900);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						Motor.B.stop(true);
+						Motor.C.stop(true);
+						write(50);
+						break;
+						
+						
+						
+						
+					}
+					
+					
+					if(ColorS.getColor().getGreen()>20) {
+						
+						found =true;
+						Motor.B.stop(true);
+						Motor.C.stop(true);
+						write(1);
+						break;
+						
+						
+						
+						
+						
+					}
+					
+					
+					
+					
+					
+					if (LightSL.getLightValue() >= 51||LightSR.getLightValue()>=51) {
+						Motor.B.stop(true);
+						Motor.C.stop(true);
+						found=true;
+						
 						write(1);
 						break;
 					}
@@ -208,9 +298,9 @@ public class Main {
 					Motor.C.forward();
 				}
 								try {
-					for (int i = 0; i <= 9; i++) {
+					for (int i = 0; i <= 4; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -249,9 +339,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 11; i++) {
+					for (int i = 0; i <= 5; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
+							
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -290,9 +381,9 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 14; i++) {
+					for (int i = 0; i <= 6; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -331,9 +422,9 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 16; i++) {
+					for (int i = 0; i <= 7; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -371,10 +462,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 19; i++) {
+					for (int i = 0; i <= 8; i++) {
 						Thread.sleep(100);
 
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -412,9 +503,9 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 21; i++) {
+					for (int i = 0; i <= 9; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -452,10 +543,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 9; i++) {
+					for (int i = 0; i <= 10; i++) {
 						Thread.sleep(100);
 
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -495,7 +586,7 @@ public class Main {
 				try {
 					for (int i = 0; i <= 11; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -533,10 +624,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 14; i++) {
+					for (int i = 0; i <= 12; i++) {
 						Thread.sleep(100);
 
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -574,9 +665,9 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 17; i++) {
+					for (int i = 0; i <= 13; i++) {
 						Thread.sleep(100);
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -615,10 +706,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 19; i++) {
+					for (int i = 0; i <= 14; i++) {
 						Thread.sleep(100);
 
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -656,10 +747,10 @@ public class Main {
 					Motor.C.forward();
 				}
 				try {
-					for (int i = 0; i <= 21; i++) {
+					for (int i = 0; i <= 15; i++) {
 						Thread.sleep(100);
 
-						if (LightSL.getLightValue() == 48 || LightSL.getLightValue() == 49) {
+						if ((LightSL.getLightValue()>=47 && LightSL.getLightValue()<=49)||(LightSR.getLightValue()>=47 && LightSR.getLightValue()<=49)) {
 							Motor.B.backward();
 							Motor.C.backward();
 							Thread.sleep(200);
@@ -684,6 +775,8 @@ public class Main {
 			}
 				break;
 
+				
+			
 //			case 1: {
 //
 //				
