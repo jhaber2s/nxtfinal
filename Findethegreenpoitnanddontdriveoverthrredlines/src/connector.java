@@ -9,47 +9,32 @@ import lejos.nxt.comm.NXTConnection;
 
 public class connector {
 	
-	public DataOutputStream dataout;
-	public DataInputStream datain;
-	public NXTConnection nxt;
-	public String adress;
+private	NXTConnection bluecon;
+private	DataInputStream datain;
+private DataOutputStream dataout;
 	
-public connector() {
-	
-}
-
-public void connect() {
-	nxt = Bluetooth.waitForConnection();
-	dataout = nxt.openDataOutputStream();
-	datain = nxt.openDataInputStream();
-	
-	
-}
-
-public int readdata() {
-	int data;
-	
-	try {
-	data = datain.read();
-	return data;
-	}catch(IOException e) 
-	{
+	public connector() {
 		
-		return -1;
+		bluecon = Bluetooth.waitForConnection();
+		bluecon.setIOMode(bluecon.RAW);
+		datain = bluecon.openDataInputStream();
+		dataout = bluecon.openDataOutputStream();
+				
+		
+	}
+	
+	public int read() throws IOException {
+		
+		return datain.read();
+		
+	}
+	
+	public void write(int msg) throws IOException{
+		dataout.write(msg);
+		dataout.flush();
 		
 	}
 	
 	
-}
 
-public void senddata(int data) {
-	try {
-	dataout.write(data);
-	}
-	catch(IOException e) {
-		
-		
-	}
-	
-}
 }

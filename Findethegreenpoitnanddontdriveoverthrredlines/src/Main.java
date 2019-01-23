@@ -4,6 +4,7 @@ import lejos.nxt.Motor;
 import lejos.nxt.addon.ColorHTSensor;
 import lejos.nxt.addon.CompassHTSensor;
 import lejos.nxt.SensorPort;
+import lejos.nxt.Sound;
 import lejos.nxt.comm.Bluetooth;
 import lejos.nxt.LightSensor;
 import lejos.nxt.comm.NXTConnection;
@@ -22,14 +23,16 @@ public class Main {
 	public static void main(String[] Args) throws IOException {
 
 		
+		
+		Sound.beep();
+		
+		
 		LightSensor LightSR = new LightSensor(SensorPort.S3);
 		LightSensor LightSL = new LightSensor(SensorPort.S1);
 		ColorHTSensor ColorS = new ColorHTSensor(SensorPort.S2);
-
-		bluetoothConnection = Bluetooth.waitForConnection();
-		bluetoothConnection.setIOMode(NXTConnection.RAW);
-		dataOutputStream = bluetoothConnection.openDataOutputStream();
-		dataInputStream = bluetoothConnection.openDataInputStream();
+		motorcontrol mcon = new motorcontrol();
+		connector con = new connector();
+		Sound.beep();
 
 		int androidmessage = 0;
 		boolean end = false;
@@ -109,7 +112,7 @@ public class Main {
 
 		while (true) {
 			try {
-				androidmessage = read();
+				androidmessage = con.read();
 			} catch (IOException e) {
 
 			}
@@ -119,15 +122,20 @@ public class Main {
 			switch (androidmessage) {
 
 			case 100: {
+				if (found) {
+					con.write(1);
+					Sound.twoBeeps();
+					break;
+					
+				}
+				
 				links= false;
 				rechts= false;
 
-				Motor.B.setSpeed(250);
-				Motor.C.setSpeed(250);
+				mcon.setspeed(250);
 
 				if(!found) {
-				Motor.B.forward();
-				Motor.C.forward();
+				mcon.vorwaerts();
 				
 				}
 
@@ -142,8 +150,7 @@ public class Main {
 						links = true;
 						rechts= false;
 						
-						Motor.B.setSpeed(250);
-						Motor.C.setSpeed(250);
+						mcon.setspeed(250);
 						
 						
 						
@@ -153,32 +160,28 @@ public class Main {
 							}
 							if (LightSL.getLightValue() > 51) {
 								found = true;
-								Motor.B.stop(true);
-								Motor.C.stop(true);
-								write(1);
+								mcon.stop();
+								con.write(1);
+								Sound.twoBeeps();
 								break;
 							}
 						}
 						if (found == true) {
 							break;
 						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
-						
-						Motor.B.backward();
-						Motor.C.backward();
+						mcon.stop();
+						Sound.buzz();
+						mcon.setspeed(360);
+						mcon.rueckwerts();
 						try {
 							Thread.sleep(900);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						write(50);
+						mcon.stop();
+						con.write(50); 
+						
 						break;
 					}
 					
@@ -187,40 +190,36 @@ public class Main {
 						links = false;
 						rechts= true;
 						
-						Motor.B.setSpeed(250);
-						Motor.C.setSpeed(250);
+						mcon.setspeed(250);
 						while (true) {
 							if (LightSL.getLightValue() < 47) {
 								break;
 							}
 							if (LightSL.getLightValue() > 51) {
 								found = true;
-								Motor.B.stop(true);
-								Motor.C.stop(true);
-								write(1);
+								mcon.stop();
+								con.write(1);
+								Sound.twoBeeps();
 								break;
 							}
 						}
 						if (found == true) {
 							break;
 						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						
+						mcon.stop();
+						Sound.buzz();
 
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
-						Motor.B.backward();
-						Motor.C.backward();
+						mcon.setspeed(360);
+						mcon.rueckwerts();
 						try {
 							Thread.sleep(900);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						write(50);
+						mcon.stop();
+						con.write(50);
+						
 						break;
 					}
 					
@@ -228,22 +227,19 @@ public class Main {
 					if((ColorS.getColor().getGreen()<5)&&(ColorS.getColor().getRed()>5)) {
 						
 					links= true;
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-
-						Motor.B.setSpeed(360);
-						Motor.C.setSpeed(360);
-						Motor.B.backward();
-						Motor.C.backward();
+						mcon.stop();
+						Sound.buzz();
+						mcon.setspeed(360);
+						mcon.rueckwerts();
 						try {
 							Thread.sleep(900);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						write(50);
+						mcon.stop();
+						con.write(50); 
+						
 						break;
 						
 						
@@ -255,9 +251,9 @@ public class Main {
 					if(ColorS.getColor().getGreen()>20) {
 						
 						found =true;
-						Motor.B.stop(true);
-						Motor.C.stop(true);
-						write(1);
+						mcon.stop();
+						con.write(1);
+						Sound.twoBeeps();
 						break;
 						
 						
@@ -271,11 +267,11 @@ public class Main {
 					
 					
 					if (LightSL.getLightValue() >= 51||LightSR.getLightValue()>=51) {
-						Motor.B.stop(true);
-						Motor.C.stop(true);
+						mcon.stop();
 						found=true;
 						
-						write(1);
+						con.write(1);
+						Sound.twoBeeps();
 						break;
 					}
 				}
@@ -867,13 +863,6 @@ public class Main {
 
 	}
 
-	public static int read() throws IOException {
-		return dataInputStream.read();
-	}
-
-	public static void write(int x) throws IOException {
-		dataOutputStream.write(x);
-		dataOutputStream.flush();
-	}
+	
 
 }
